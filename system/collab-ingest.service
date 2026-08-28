@@ -1,0 +1,12 @@
+[Unit]
+Description=Collab workspace daily Human Event ingestion
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=__WORKSPACE__
+ExecStart=/usr/bin/node __WORKSPACE__/scripts/hermes-human-event-reconcile.mjs --full-ingest --reason scheduled-09
+TimeoutStartSec=30min
+UMask=0007
+Environment=NODE_ENV=production

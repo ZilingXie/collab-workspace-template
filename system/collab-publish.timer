@@ -1,0 +1,10 @@
+[Unit]
+Description=Publish collab workspace public data daily at 01:00
+
+[Timer]
+OnCalendar=*-*-* 01:00:00
+Persistent=true
+Unit=collab-publish.service
+
+[Install]
+WantedBy=timers.target

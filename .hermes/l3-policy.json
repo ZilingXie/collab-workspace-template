@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "policy_id": "project-hermes-l3-hard-prohibition",
+  "enforcement": "hard_deny",
+  "human_override_allowed": false,
+  "audit_path": ".hermes/audit/l3-blocks.jsonl",
+  "rules": [
+    {
+      "id": "L3-DATA-001",
+      "category": "irreversible_data_destruction",
+      "reason": "Irreversible or broad data destruction is prohibited.",
+      "patterns": [
+        "\\brm\\s+-[^\\n]*r[^\\n]*f\\b",
+        "\\b(drop\\s+(database|schema|table)|truncate\\s+table|format\\s+(disk|volume)|wipe\\s+(all|the)\\s+(data|backups?))\\b",
+        "\\b(delete|erase|destroy|remove)\\s+(all|every|the entire)\\s+(production\\s+)?(data|backups?)\\b",
+        "(永久|不可恢复|不可逆).{0,18}(删除|清除|销毁)",
+        "(删除|清除|销毁).{0,18}(全部数据|所有备份|生产数据)"
+      ],
+      "alternatives": [
+        "Create a scoped backup and recovery plan.",
+        "Move selected records to a reversible quarantine or archive.",
+        "Produce a dry-run deletion manifest for human execution."
+      ]
+    },
+    {
+      "id": "L3-IDENTITY-001",
+      "category": "identity_credentials_privilege",
+      "reason": "Credential, identity, or privileged-access mutation is prohibited.",
+      "patterns": [
+        "\\b(reset|change|rotate|revoke|issue|create)\\s+(the\\s+)?(password|credential|secret|token|api key|ssh key)\\b",
+        "\\b(grant|assign|enable|add)\\s+[^\\n]{0,30}\\b(admin|administrator|root|sudo|owner)\\b",
+        "(重置|修改|轮换|吊销|签发|创建).{0,15}(密码|凭据|密钥|令牌|token)",
+        "(授予|添加|提升|开启).{0,15}(管理员|root|sudo|所有者|最高权限)"
+      ],
+      "alternatives": [
+        "Prepare a credential-rotation checklist without accessing secret values.",
+        "Draft a least-privilege access request for a human administrator.",
+        "Audit current permission metadata in read-only mode."
+      ]
+    },
+    {
+      "id": "L3-SECURITY-001",
+      "category": "security_or_audit_weakening",
+      "reason": "Disabling or weakening security, authorization, backup, or audit controls is prohibited.",
+      "patterns": [
+        "\\b(disable|bypass|remove|weaken|turn off)\\s+[^\\n]{0,35}\\b(audit|logging|authentication|authorization|mfa|2fa|firewall|security|backup)\\b",
+        "(关闭|禁用|绕过|移除|削弱).{0,18}(审计|日志|认证|鉴权|授权|多因素|防火墙|安全控制|备份)"
+      ],
+      "alternatives": [
+        "Diagnose the control failure using read-only evidence.",
+        "Propose a narrowly scoped L0-L2 configuration change that preserves audit and recovery.",
+        "Escalate the required control change to a human administrator."
+      ]
+    },
+    {
+      "id": "L3-PRODUCTION-001",
+      "category": "high_impact_production_operation",
+      "reason": "High-impact production operations and irreversible migrations are prohibited.",
+      "patterns": [
+        "\\b(force\\s+deploy|force\\s+push|destroy\\s+(the\\s+)?(production|prod)|terminate\\s+(the\\s+)?(production|prod)\\s+(cluster|service)|irreversible\\s+migration)\\b",
+        "\\b(change|replace|delete|remove)\\s+[^\\n]{0,25}\\b(production|prod)\\s+(database|dns|firewall|cluster|network)\\b",
+        "(强制部署|强制推送|销毁生产|不可逆迁移)",
+        "(修改|替换|删除|移除).{0,15}(生产数据库|生产DNS|生产防火墙|生产集群|生产网络)"
+      ],
+      "alternatives": [
+        "Prepare and verify a staging change with rollback steps.",
+        "Generate a production runbook for explicit human execution.",
+        "Perform read-only health checks and impact analysis."
+      ]
+    },
+    {
+      "id": "L3-EXTERNAL-001",
+      "category": "external_commitment_or_representation",
+      "reason": "Making external commitments or representations on behalf of a human is prohibited.",
+      "patterns": [
+        "\\b(send|publish|announce|promise|commit|approve|accept|sign)\\s+[^\\n]{0,40}\\b(on behalf of|to (the )?(customer|client|public|press|regulator))\\b",
+        "(代表|代替).{0,12}(Zac|Vivi|人类|公司).{0,18}(发送|发布|承诺|批准|接受|签署)",
+        "(向客户|向公众|向媒体|向监管机构).{0,18}(发送|发布|宣布|承诺)"
+      ],
+      "alternatives": [
+        "Draft the message or commitment for human review without sending it.",
+        "Prepare an internal decision brief with unresolved points clearly marked.",
+        "Ask the responsible human to perform the external action."
+      ]
+    },
+    {
+      "id": "L3-FINLEGAL-001",
+      "category": "financial_or_legal_action",
+      "reason": "Financial transactions and binding legal actions are prohibited.",
+      "patterns": [
+        "\\b(pay|transfer|wire|refund|purchase|trade|sign|accept)\\s+[^\\n]{0,35}\\b(money|funds|invoice|contract|agreement|legal terms|securities)\\b",
+        "(支付|转账|汇款|退款|购买|交易|签署|接受).{0,18}(资金|款项|发票|合同|协议|法律条款|证券)"
+      ],
+      "alternatives": [
+        "Prepare a non-binding comparison or approval packet.",
+        "Draft transaction or contract details for authorized human review.",
+        "Perform read-only reconciliation without initiating a transaction."
+      ]
+    },
+    {
+      "id": "L3-PRIVACY-001",
+      "category": "sensitive_data_exfiltration",
+      "reason": "Exporting or disclosing secrets, credentials, or sensitive personal data is prohibited.",
+      "patterns": [
+        "\\b(send|upload|export|publish|post|copy)\\s+[^\\n]{0,40}\\b(passwords?|credentials?|secrets?|tokens?|private keys?|customer pii|personal data)\\b",
+        "(发送|上传|导出|发布|复制).{0,18}(密码|凭据|秘密|密钥|令牌|客户隐私|个人敏感信息)"
+      ],
+      "alternatives": [
+        "Provide a redacted schema or aggregate report.",
+        "Keep sensitive values in place and return only verification metadata.",
+        "Ask a human data owner to approve a separately governed transfer."
+      ]
+    },
+    {
+      "id": "L3-GOVERNANCE-001",
+      "category": "governance_or_audit_tampering",
+      "reason": "Deleting audit evidence or weakening the L3 boundary is prohibited.",
+      "patterns": [
+        "\\b(delete|erase|rewrite|falsify|fabricate|tamper with)\\s+[^\\n]{0,35}\\b(audit|governance|history|evidence|decision record|task card)\\b",
+        "\\b(modify|remove|disable|bypass|override|weaken)\\s+[^\\n]{0,35}\\b(l3|hard prohibition|service policy|authority boundary)\\b",
+        "(删除|清除|伪造|篡改|改写).{0,18}(审计|治理记录|历史记录|证据|决策记录|Task Card)",
+        "(修改|移除|关闭|绕过|覆盖|削弱).{0,18}(L3|硬禁止|服务策略|权限边界)"
+      ],
+      "alternatives": [
+        "Append a corrective audit entry while preserving the original record.",
+        "Propose a policy amendment for human governance outside Hermes execution.",
+        "Add a narrower L0-L2 exception without changing the hard boundary."
+      ]
+    },
+    {
+      "id": "L3-AUTOMATION-001",
+      "category": "unbounded_automation_or_fanout",
+      "reason": "Unbounded automation, unknown-agent fan-out, and uncontrolled scope expansion are prohibited.",
+      "patterns": [
+        "\\b(send|dispatch|assign|spawn|delegate)\\s+[^\\n]{0,35}\\b(all agents|every agent|unknown agents?|unregistered agents?|unlimited agents?)\\b",
+        "\\b(run|repeat|retry|loop)\\s+(forever|without limit|indefinitely|unbounded)\\b",
+        "(派发|分配|生成|委派).{0,18}(所有Agent|全部Agent|未知Agent|未注册Agent|无限Agent)",
+        "(无限|无上限|永久).{0,12}(运行|重试|循环|扩散)"
+      ],
+      "alternatives": [
+        "Limit dispatch to the registered Zac and Vivi Agents.",
+        "Set an explicit task count, deadline, retry cap, and owner.",
+        "Run one bounded pilot and review its audit trail."
+      ]
+    }
+  ]
+}

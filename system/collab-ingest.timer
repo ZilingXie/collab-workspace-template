@@ -1,0 +1,10 @@
+[Unit]
+Description=Run collab workspace ingestion at 09:00
+
+[Timer]
+OnCalendar=*-*-* 09:00:00
+Persistent=true
+Unit=collab-ingest.service
+
+[Install]
+WantedBy=timers.target

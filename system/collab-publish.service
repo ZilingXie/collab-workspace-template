@@ -1,0 +1,12 @@
+[Unit]
+Description=Collab workspace public data snapshot publish
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=__WORKSPACE__
+ExecStart=/usr/bin/node __WORKSPACE__/scripts/publish-workspace.mjs --full --reason scheduled-01
+TimeoutStartSec=30min
+UMask=0007
+Environment=NODE_ENV=production
